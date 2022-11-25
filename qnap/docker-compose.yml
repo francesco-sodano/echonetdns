@@ -3,9 +3,10 @@ services:
     pihole:
         container_name: echonetdns
         image: pihole/pihole:latest
+        mac_address: 24:5E:BE:3D:27:97
         networks:
             qnet-static:
-                ipv4_address: # container ip (must be a free one)
+                ipv4_address: 192.168.66.253
         ports:
             - 53:53/tcp
             - 53:53/udp
@@ -13,26 +14,31 @@ services:
             - 80:80/tcp
             - 443:443/tcp
         environment:
-            - PUID=501
+            - PUID=1001
             - PGID=100
             - TZ=Europe/Berlin
             - IPv6=False
             - DNS1=1.1.1.1
-            - DNS2=1.0.0.1
-            - WEBPASSWORD= #password for the WebUI
-            - SERVERIP= #qnap ip address (the physical one of your QNAP)
+            - DNS2=208.67.222.222
+            - WEBPASSWORD=XXXXXXXXXX
+            - SERVERIP=192.168.66.8
         volumes:
-            - /containers/echonetdnsshare/pihole:/etc/pihole/ #mapping your share for pihole conf
-            - /containers/echonetdnsshare/dnsmasq.d:/etc/dnsmasq.d/ #mapping your share for dnsmasq.d
+            - /share/containerstorage/echonetdns/pihole:/etc/pihole/ #mapping your share for pihole conf
+            - /share/containerstorage/echonetdns/dnsmasq.d:/etc/dnsmasq.d/ #mapping your share for dnsmasq.d
         restart: always
 
 networks:
     qnet-static:
         driver: qnet
         driver_opts:
-            iface: "eth1"
+            iface: "eth0"
         ipam:
             driver: qnet
+            options:
+                iface: "eth0"
+            config:
+                - subnet: 192.168.66.0/24
+                  gateway: 192.168.66.1
             options:
                 iface: "eth1"
             config:
